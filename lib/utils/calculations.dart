@@ -1,4 +1,28 @@
+import 'package:hijri/hijri_calendar.dart';
 import '../constants/app_constants.dart';
+
+// Model hasil konversi Tanggal Hijriah
+class HijriResult {
+  final DateTime gregorianDate;
+  final int hYear;
+  final int hMonth;
+  final int hDay;
+  final String dayName;
+  final String monthNameIndo;
+  final String fullDateHijri;
+  final String islamicNotes;
+
+  const HijriResult({
+    required this.gregorianDate,
+    required this.hYear,
+    required this.hMonth,
+    required this.hDay,
+    required this.dayName,
+    required this.monthNameIndo,
+    required this.fullDateHijri,
+    required this.islamicNotes,
+  });
+}
 
 // Model hasil perhitungan BMI
 class BmiResult {
@@ -263,6 +287,39 @@ class AppCalculations {
       pawukonDay: pawukonDay + 1, // 1-indexed untuk tampilan ramah pengguna
       approximateSakaYear: approximateSakaYear,
       academicNotes: academicNotes,
+    );
+  }
+
+  // 5. Konversi Tanggal Masehi ke Kalender Hijriah (Metode Umm al-Qura)
+  static HijriResult convertToHijri(DateTime gregorianDate) {
+    final dateOnly = DateTime(
+      gregorianDate.year,
+      gregorianDate.month,
+      gregorianDate.day,
+    );
+
+    final hijri = HijriCalendar.fromDate(dateOnly);
+    final dayIndex = dateOnly.weekday % 7;
+    final dayName = AppConstants.javaneseDays[dayIndex];
+
+    // Normalisasi indeks bulan Hijriah (1 - 12)
+    final monthIndex = (hijri.hMonth >= 1 && hijri.hMonth <= 12) ? hijri.hMonth - 1 : 0;
+    final monthNameIndo = AppConstants.hijriMonthsIndo[monthIndex];
+    final fullDateHijri = '${hijri.hDay} $monthNameIndo ${hijri.hYear} H';
+
+    const islamicNotes =
+        'Kalender Hijriah (Qamariyah) didasarkan pada peredaran bulan mengelilingi bumi (lunar cycle). '
+        'Perhitungan ini mengacu pada standar kalender Umm al-Qura.';
+
+    return HijriResult(
+      gregorianDate: dateOnly,
+      hYear: hijri.hYear,
+      hMonth: hijri.hMonth,
+      hDay: hijri.hDay,
+      dayName: dayName,
+      monthNameIndo: monthNameIndo,
+      fullDateHijri: fullDateHijri,
+      islamicNotes: islamicNotes,
     );
   }
 }

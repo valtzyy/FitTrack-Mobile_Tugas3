@@ -47,6 +47,7 @@ dependencies:
 
   # Hashing password untuk kebutuhan pembelajaran/demo
   crypto: ^3.0.6
+  hijri: ^3.0.1
 
 dev_dependencies:
   flutter_test:

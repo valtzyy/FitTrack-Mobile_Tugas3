@@ -107,4 +107,20 @@ class AppConstants {
     'Tambir', 'Medangkungan', 'Matal', 'Uye', 'Menail', 'Prangbakat',
     'Bala', 'Ugu', 'Wayang', 'Kelawu', 'Dukut', 'Watugunung',
   ];
+
+  // Daftar 12 Nama Bulan Kalender Hijriah (Bahasa Indonesia)
+  static const List<String> hijriMonthsIndo = [
+    'Muharram',
+    'Safar',
+    "Rabi'ul Awwal",
+    "Rabi'ul Akhir",
+    'Jumadil Awwal',
+    'Jumadil Akhir',
+    'Rajab',
+    "Sya'ban",
+    'Ramadhan',
+    'Syawwal',
+    "Dzulqa'dah",
+    'Dzulhijjah',
+  ];
 }

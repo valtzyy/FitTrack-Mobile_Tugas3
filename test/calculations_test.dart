@@ -166,4 +166,39 @@ void main() {
       expect(AppValidators.validateEmail('user@domain.com'), isNull);
     });
   });
+
+  group('6. Pengujian Konversi Kalender Hijriah (AppCalculations.convertToHijri)', () {
+    test('Verifikasi konversi tanggal Proklamasi RI 17 Agustus 1945 ke kalender Hijriah (Ramadhan 1364 H)', () {
+      final date = DateTime(1945, 8, 17);
+      final result = AppCalculations.convertToHijri(date);
+
+      expect(result.dayName, 'Jumat');
+      expect(result.hYear, 1364);
+      expect(result.hMonth, 9); // Ramadhan
+      expect(result.monthNameIndo, 'Ramadhan');
+      expect(result.fullDateHijri, contains('Ramadhan 1364 H'));
+    });
+
+    test('Verifikasi konversi tahun baru Islam 1 Muharram 1446 H (7 Juli 2024)', () {
+      final date = DateTime(2024, 7, 7);
+      final result = AppCalculations.convertToHijri(date);
+
+      expect(result.hYear, 1446);
+      expect(result.hMonth, 1); // Muharram
+      expect(result.monthNameIndo, 'Muharram');
+      expect(result.fullDateHijri, contains('Muharram 1446 H'));
+    });
+
+    test('Memastikan seluruh properti hasil konversi terisi dan valid', () {
+      final now = DateTime.now();
+      final result = AppCalculations.convertToHijri(now);
+
+      expect(result.hYear, greaterThan(1440));
+      expect(result.hMonth, inInclusiveRange(1, 12));
+      expect(result.hDay, inInclusiveRange(1, 30));
+      expect(AppConstants.hijriMonthsIndo, contains(result.monthNameIndo));
+      expect(result.fullDateHijri, endsWith('H'));
+      expect(result.islamicNotes, isNotEmpty);
+    });
+  });
 }

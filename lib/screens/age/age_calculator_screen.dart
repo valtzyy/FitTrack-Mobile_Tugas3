@@ -4,7 +4,7 @@ import '../../utils/formatters.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
 
-// Layar Menu Perhitungan Umur Sadar Kalender berdasarkan Tanggal Lahir
+// Layar Menu Konversi Tanggal Hijriah & Kalkulator Umur Sadar Kalender
 class AgeCalculatorScreen extends StatefulWidget {
   const AgeCalculatorScreen({super.key});
 
@@ -16,6 +16,7 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
   DateTime? _selectedBirthDate;
   final _dateController = TextEditingController();
   AgeResult? _ageResult;
+  HijriResult? _hijriResult;
 
   @override
   void dispose() {
@@ -23,14 +24,14 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
     super.dispose();
   }
 
-  // Membuka dialog pemilih tanggal lahir
+  // Membuka dialog pemilih tanggal lahir / masehi
   Future<void> _pickBirthDate() async {
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
       initialDate: _selectedBirthDate ?? DateTime(2000, 1, 1),
       firstDate: DateTime(1900),
-      lastDate: now, // Validasi otomatis: tidak boleh memilih tanggal di masa depan
+      lastDate: now, // Validasi: tidak boleh memilih tanggal di masa depan
     );
 
     if (picked != null) {
@@ -41,12 +42,12 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
     }
   }
 
-  // Menghitung umur sadar kalender
-  void _calculateAge() {
+  // Menghitung umur sadar kalender dan melakukan konversi ke kalender Hijriah
+  void _calculateAgeAndHijri() {
     if (_selectedBirthDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Silakan pilih tanggal lahir terlebih dahulu.'),
+          content: Text('Silakan pilih tanggal terlebih dahulu.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -54,9 +55,11 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
     }
 
     try {
-      final result = AppCalculations.calculateAge(_selectedBirthDate!);
+      final age = AppCalculations.calculateAge(_selectedBirthDate!);
+      final hijri = AppCalculations.convertToHijri(_selectedBirthDate!);
       setState(() {
-        _ageResult = result;
+        _ageResult = age;
+        _hijriResult = hijri;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -66,6 +69,38 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
         ),
       );
     }
+  }
+
+  // Widget pembantu untuk merender baris detail informasi
+  Widget _buildInfoRow({
+    required String label,
+    required String value,
+    required IconData icon,
+    Color? iconColor,
+    Color? valueColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: iconColor ?? Colors.grey.shade600),
+          const SizedBox(width: 10),
+          Text(
+            label,
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+          ),
+          const Spacer(),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: valueColor ?? const Color(0xFF1E293B),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // Widget pembantu untuk merender kartu angka total waktu
@@ -105,11 +140,47 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
     );
   }
 
+  // Widget bulatan angka unit umur (Tahun, Bulan, Hari)
+  Widget _buildAgeUnitCircle(String value, String unit, Color color) {
+    return Column(
+      children: [
+        Container(
+          width: 72,
+          height: 72,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: color.withAlpha(20),
+            border: Border.all(color: color, width: 2),
+          ),
+          child: Center(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          unit,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1E293B),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kalkulator Umur'),
+        title: const Text('Konversi Hijriah & Umur'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -117,7 +188,7 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Formulir Pemilihan Tanggal Lahir
+              // 1. Formulir Pemilihan Tanggal Lahir / Masehi
               Card(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 child: Padding(
@@ -126,7 +197,7 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const Text(
-                        'Pilih Tanggal Lahir Anda',
+                        'Pilih Tanggal Lahir / Tanggal Masehi',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -135,28 +206,28 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Tekan kolom di bawah untuk memilih tanggal dari kalender.',
+                        'Pilih tanggal untuk melihat konversi kalender Hijriah dan rincian umur lengkap.',
                         style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                       ),
                       const SizedBox(height: 16),
 
-                      // Input Tanggal Lahir (Read Only + Tap)
+                      // Input Tanggal (Read Only + Tap DatePicker)
                       AppTextField(
                         controller: _dateController,
-                        label: 'Tanggal Lahir',
+                        label: 'Tanggal Masehi / Tanggal Lahir',
                         hint: 'DD/MM/YYYY',
                         readOnly: true,
-                        prefixIcon: Icons.cake_outlined,
-                        suffixIcon: const Icon(Icons.calendar_month_rounded),
+                        prefixIcon: Icons.calendar_month_rounded,
+                        suffixIcon: const Icon(Icons.event_available_rounded),
                         onTap: _pickBirthDate,
                       ),
                       const SizedBox(height: 20),
 
-                      // Tombol Hitung Umur
+                      // Tombol Eksekusi
                       AppButton(
-                        text: 'HITUNG UMUR',
+                        text: 'HITUNG UMUR & KONVERSI HIJRIAH',
                         icon: Icons.calculate_outlined,
-                        onPressed: _calculateAge,
+                        onPressed: _calculateAgeAndHijri,
                       ),
                     ],
                   ),
@@ -164,23 +235,198 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Hasil Perhitungan Umur
+              // 2. Kartu Hasil Konversi Kalender Hijriah
+              if (_hijriResult != null) ...[
+                Card(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: const BorderSide(color: Color(0xFF0F766E), width: 1.8),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0F766E).withAlpha(30),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.nights_stay_rounded,
+                                color: Color(0xFF0F766E),
+                                size: 22,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Hasil Konversi Kalender Hijriah',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF0F172A),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Standar Astronomis Umm al-Qura',
+                                    style: TextStyle(fontSize: 11, color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+
+                        // Banner Highlight Tanggal Hijriah
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF0F766E), Color(0xFF115E59)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                _hijriResult!.fullDateHijri,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Hari ${_hijriResult!.dayName}',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white.withAlpha(220),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+
+                        _buildInfoRow(
+                          label: 'Tanggal Masehi',
+                          value: AppFormatters.formatDateFull(_hijriResult!.gregorianDate),
+                          icon: Icons.calendar_today_rounded,
+                        ),
+                        _buildInfoRow(
+                          label: 'Hari',
+                          value: _hijriResult!.dayName,
+                          icon: Icons.today_rounded,
+                        ),
+                        _buildInfoRow(
+                          label: 'Tanggal Hijriah',
+                          value: '${_hijriResult!.hDay}',
+                          icon: Icons.tag_rounded,
+                          valueColor: const Color(0xFF0F766E),
+                        ),
+                        _buildInfoRow(
+                          label: 'Bulan Hijriah',
+                          value: '${_hijriResult!.monthNameIndo} (Bulan ke-${_hijriResult!.hMonth})',
+                          icon: Icons.brightness_medium_rounded,
+                          valueColor: const Color(0xFF0F766E),
+                        ),
+                        _buildInfoRow(
+                          label: 'Tahun Hijriah',
+                          value: '${_hijriResult!.hYear} H / AH',
+                          icon: Icons.auto_awesome_rounded,
+                          valueColor: const Color(0xFF0F766E),
+                        ),
+                        const Divider(height: 20),
+
+                        // Catatan Edukatif
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(Icons.info_outline_rounded, size: 16, color: Colors.teal.shade700),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                _hijriResult!.islamicNotes,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  height: 1.4,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+              ],
+
+              // 3. Kartu Hasil Perhitungan Umur Detail
               if (_ageResult != null) ...[
                 Card(
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: Color(0xFFEC4899), width: 2),
+                    side: const BorderSide(color: Color(0xFFEC4899), width: 1.8),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(18.0),
                     child: Column(
                       children: [
-                        const Text(
-                          'Umur Anda Saat Ini',
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEC4899).withAlpha(30),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.cake_rounded,
+                                color: Color(0xFFEC4899),
+                                size: 22,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Rincian Umur Sadar Kalender',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF0F172A),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Perhitungan presisi tahun, bulan, hari, jam, menit, detik',
+                                    style: TextStyle(fontSize: 11, color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 16),
 
                         // Rincian Tahun, Bulan, Hari
                         Row(
@@ -203,7 +449,7 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
                             ),
                           ],
                         ),
-                        const Divider(height: 32),
+                        const Divider(height: 30),
 
                         // Informasi Total Waktu Estimasi
                         Align(
@@ -274,41 +520,6 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildAgeUnitCircle(String value, String unit, Color color) {
-    return Column(
-      children: [
-        Container(
-          width: 72,
-          height: 72,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: color.withAlpha(20),
-            border: Border.all(color: color, width: 2),
-          ),
-          child: Center(
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          unit,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF1E293B),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -275,12 +275,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () => Navigator.pushNamed(context, AppRoutes.converter),
               ),
 
-              // 5. Menu Perhitungan Umur
+              // 5. Menu Konversi Tanggal Hijriah & Perhitungan Umur
               _buildMenuCard(
-                title: 'Kalkulator Umur',
-                subtitle: 'Hitung umur sadar kalender berdasarkan tanggal lahir',
-                icon: Icons.cake_rounded,
-                color: const Color(0xFFEC4899),
+                title: 'Konversi Hijriah & Umur',
+                subtitle: 'Konversi tanggal ke kalender Hijriah & hitung umur detail',
+                icon: Icons.nights_stay_rounded,
+                color: const Color(0xFF0F766E),
                 onTap: () => Navigator.pushNamed(context, AppRoutes.age),
               ),
 
