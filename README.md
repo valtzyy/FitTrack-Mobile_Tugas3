@@ -273,11 +273,11 @@ flutter test
 
 ---
 
-## 👥 Pembagian Tugas Kelompok (3-4 Mahasiswa)
+## 👥 Data & Pembagian Tugas Kelompok Pengembang
 
-| Anggota | Peran & Modul | Deskripsi Pekerjaan |
+| Anggota & NIM | Peran & Modul | Deskripsi Pekerjaan |
 |---|---|---|
-| **Mahasiswa 1** | *Authentication & Session Lead* | Mengembangkan `LoginScreen`, `SplashScreen`, `AuthService`, `SessionService`, serta navigasi rute terpusat. |
-| **Mahasiswa 2** | *Database & CRUD Lead* | Mengembangkan `DatabaseService` (SQLite), model data (`WorkoutModel`, `MemberModel`), serta layar `WorkoutsScreen` (CRUD) dan `MembersScreen`. |
-| **Mahasiswa 3** | *Computation & Mathematical Logic Lead* | Mengembangkan logika kalkulasi `BmiScreen`, `WeightConverterScreen`, `AgeCalculatorScreen`, serta unit tests di `test/calculations_test.dart`. |
-| **Mahasiswa 4** | *UI/UX, Calendar & QA Lead* | Mengembangkan tema aplikasi `AppTheme`, `StopwatchScreen`, `WetonSakaScreen`, `HelpScreen`, pengujian linter, serta penyusunan dokumentasi. |
+| **M. Eufrat Ayyash**<br>`124240092` | *Authentication & Session Lead* | Mengembangkan `LoginScreen`, `SplashScreen`, `AuthService`, `SessionService`, serta navigasi rute terpusat. |
+| **Rais Mukhtar Hakim**<br>`124240107` | *Database & CRUD Lead* | Mengembangkan `DatabaseService` (SQLite v2), model data (`WorkoutModel`, `MemberModel`), serta layar `WorkoutsScreen` (CRUD) dan `MembersScreen`. |
+| **Novaldo Putra Nugraha**<br>`124240110` | *Computation & Mathematical Logic Lead* | Mengembangkan logika kalkulasi `BmiScreen`, `WeightConverterScreen`, `AgeCalculatorScreen` (Konversi Hijriah & Umur), serta unit tests di `test/calculations_test.dart`. |
+| **Loddy Luvian Nugraha**<br>`124240120` | *UI/UX, Calendar & QA Lead* | Mengembangkan tema aplikasi `AppTheme`, tata letak 5 menu terpusat `HomeScreen`, `StopwatchScreen`, `WetonSakaScreen`, `HelpScreen`, pengujian linter, serta dokumentasi. |

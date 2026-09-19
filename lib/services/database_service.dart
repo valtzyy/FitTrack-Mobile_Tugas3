@@ -39,9 +39,28 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
+  }
+
+  // Menangani migrasi/pembaruan versi database
+  Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Hapus data contoh lama jika masih ada
+      await db.delete(
+        'members',
+        where: "name IN ('Ahmad Faiz', 'Siti Nurhaliza', 'Budi Santoso')",
+      );
+      // Masukkan 4 anggota resmi kelompok jika tabel kosong atau data lama dibersihkan
+      final count = Sqflite.firstIntValue(
+        await db.rawQuery('SELECT COUNT(*) FROM members'),
+      ) ?? 0;
+      if (count == 0) {
+        await _seedGroupMembers(db);
+      }
+    }
   }
 
   // Membuat tabel-tabel SQLite saat basis data pertama kali dibuat
@@ -87,6 +106,45 @@ class DatabaseService {
     await _seedInitialData(db);
   }
 
+  // Memasukkan data 4 anggota resmi tim pengembang
+  Future<void> _seedGroupMembers(Database db) async {
+    final now = DateTime.now().toIso8601String();
+    final groupMembers = [
+      MemberModel(
+        name: 'M. Eufrat Ayyash',
+        email: '124240092@student.upnyk.ac.id',
+        gender: 'Laki-laki',
+        age: 20,
+        createdAt: now,
+      ),
+      MemberModel(
+        name: 'Rais Mukhtar Hakim',
+        email: '124240107@student.upnyk.ac.id',
+        gender: 'Laki-laki',
+        age: 20,
+        createdAt: now,
+      ),
+      MemberModel(
+        name: 'Novaldo Putra Nugraha',
+        email: '124240110@student.upnyk.ac.id',
+        gender: 'Laki-laki',
+        age: 20,
+        createdAt: now,
+      ),
+      MemberModel(
+        name: 'Loddy Luvian Nugraha',
+        email: '124240120@student.upnyk.ac.id',
+        gender: 'Laki-laki',
+        age: 20,
+        createdAt: now,
+      ),
+    ];
+
+    for (final member in groupMembers) {
+      await db.insert('members', member.toMap());
+    }
+  }
+
   // Fungsi seeder untuk memasukkan akun demo dan data contoh awal
   Future<void> _seedInitialData(Database db) async {
     final now = DateTime.now().toIso8601String();
@@ -100,34 +158,8 @@ class DatabaseService {
     );
     await db.insert('users', adminUser.toMap());
 
-    // 2. Seed data anggota tim / mahasiswa contoh
-    final initialMembers = [
-      MemberModel(
-        name: 'Ahmad Faiz',
-        email: 'faiz@student.ac.id',
-        gender: 'Laki-laki',
-        age: 21,
-        createdAt: now,
-      ),
-      MemberModel(
-        name: 'Siti Nurhaliza',
-        email: 'siti@student.ac.id',
-        gender: 'Perempuan',
-        age: 20,
-        createdAt: now,
-      ),
-      MemberModel(
-        name: 'Budi Santoso',
-        email: 'budi@student.ac.id',
-        gender: 'Laki-laki',
-        age: 22,
-        createdAt: now,
-      ),
-    ];
-
-    for (final member in initialMembers) {
-      await db.insert('members', member.toMap());
-    }
+    // 2. Seed data anggota resmi kelompok pengembang
+    await _seedGroupMembers(db);
 
     // 3. Seed data latihan fisik contoh
     final initialWorkouts = [
