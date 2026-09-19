@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../app/routes.dart';
 import '../../constants/app_constants.dart';
 import '../../utils/calculations.dart';
 import '../../utils/formatters.dart';
@@ -82,6 +83,13 @@ class _BmiScreenState extends State<BmiScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kalkulator BMI'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.swap_horiz_rounded),
+            tooltip: 'Konversi Satuan Berat (lbs/oz)',
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.converter),
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(

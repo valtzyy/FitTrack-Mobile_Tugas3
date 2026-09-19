@@ -223,13 +223,13 @@ class HelpScreen extends StatelessWidget {
                 number: '7',
                 title: 'Cara Menggunakan Konversi Berat',
                 content:
-                    'Buka menu "Konversi Satuan Berat". Masukkan nilai angka, pilih satuan asal dan satuan tujuan (tersedia kg, gram, pound, dan ounce), lalu tekan tombol "KONVERSI".',
+                    'Akses fitur konversi berat melalui tombol ikon di pojok kanan atas halaman Kalkulator BMI. Masukkan angka, pilih satuan (kg, gram, pound/lbs, atau ounce/oz), lalu tekan tombol "KONVERSI".',
               ),
               _buildHelpItem(
                 number: '8',
-                title: 'Cara Menghitung Umur',
+                title: 'Cara Konversi Hijriah & Hitung Umur',
                 content:
-                    'Buka menu "Kalkulator Umur". Tekan tombol pemilih tanggal untuk menentukan tanggal lahir Anda, lalu tekan "HITUNG UMUR" untuk melihat umur detail dalam tahun, bulan, hari, serta estimasi total waktu.',
+                    'Buka menu "Konversi Hijriah & Umur" dari Beranda. Pilih tanggal lahir atau tanggal Masehi yang diinginkan, lalu tekan tombol "HITUNG UMUR & KONVERSI HIJRIAH" untuk melihat rincian tanggal kalender Hijriah (Umm al-Qura) dan rincian umur sadar kalender dalam tahun, bulan, hari, jam, menit, dan detik.',
               ),
               _buildHelpItem(
                 number: '9',

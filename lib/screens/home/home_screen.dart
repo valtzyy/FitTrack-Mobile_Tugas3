@@ -3,7 +3,7 @@ import '../../app/routes.dart';
 import '../../constants/app_constants.dart';
 import '../../services/session_service.dart';
 
-// Layar utama (Home Screen) yang memuat salam personal dan 6 kartu menu fungsional vertikal
+// Layar utama (Home Screen) yang memuat salam personal dan 5 kartu menu vertikal terpusat di tengah layar
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -87,28 +87,29 @@ class _HomeScreenState extends State<HomeScreen> {
     required VoidCallback onTap,
   }) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
+      elevation: 2,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           child: Row(
             children: [
               // Wadah Ikon Berwarna
               Container(
-                width: 50,
-                height: 50,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   color: color.withAlpha(30),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: color, size: 28),
+                child: Icon(icon, color: color, size: 26),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               // Teks Judul dan Deskripsi Menu
               Expanded(
                 child: Column(
@@ -117,16 +118,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       title,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF1E293B),
                       ),
                     ),
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 2),
                     Text(
                       subtitle,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 11.5,
                         color: Colors.grey.shade600,
                       ),
                     ),
@@ -136,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // Ikon Panah Kanan
               Icon(
                 Icons.arrow_forward_ios_rounded,
-                size: 16,
+                size: 15,
                 color: Colors.grey.shade400,
               ),
             ],
@@ -163,137 +164,123 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(18.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Bagian Salam dan Deskripsi
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      theme.colorScheme.primary,
-                      theme.colorScheme.primary.withAlpha(200),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.colorScheme.primary.withAlpha(40),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 14.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight - 28),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.waving_hand_rounded, color: Colors.amber, size: 24),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Halo, $_userFullName!',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                    // Header Salam Personal Ringkas
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      margin: const EdgeInsets.only(bottom: 18),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            theme.colorScheme.primary,
+                            theme.colorScheme.primary.withAlpha(200),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: theme.colorScheme.primary.withAlpha(35),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.waving_hand_rounded, color: Colors.amber, size: 24),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Halo, $_userFullName!',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Pilih salah satu dari 5 menu utama di bawah:',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.white.withAlpha(220),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                        // Tombol logout cepat di samping nama
-                        IconButton(
-                          icon: const Icon(Icons.logout_rounded, color: Colors.white70, size: 20),
-                          tooltip: 'Logout',
-                          onPressed: _showLogoutDialog,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Kelola aktivitas kebugaran Anda dengan mudah.',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.white.withAlpha(220),
+                          IconButton(
+                            icon: const Icon(Icons.logout_rounded, color: Colors.white70, size: 20),
+                            tooltip: 'Logout',
+                            onPressed: _showLogoutDialog,
+                          ),
+                        ],
                       ),
+                    ),
+
+                    // 1. Menu Daftar Anggota
+                    _buildMenuCard(
+                      title: 'Daftar Anggota',
+                      subtitle: 'Daftar anggota kelompok pengembang & pengguna',
+                      icon: Icons.groups_rounded,
+                      color: const Color(0xFF0284C7),
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.members),
+                    ),
+
+                    // 2. Menu Komputasi Tema: Kalkulator BMI
+                    _buildMenuCard(
+                      title: 'Kalkulator BMI',
+                      subtitle: 'Hitung Indeks Massa Tubuh & ketahui berat ideal',
+                      icon: Icons.monitor_weight_rounded,
+                      color: const Color(0xFF10B981),
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.bmi),
+                    ),
+
+                    // 3. Menu CRUD Tema: Catatan Latihan Fisik
+                    _buildMenuCard(
+                      title: 'Catatan Latihan Fisik',
+                      subtitle: 'Kelola aktivitas workout (tambah, lihat, ubah, hapus)',
+                      icon: Icons.fitness_center_rounded,
+                      color: const Color(0xFFF97316),
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.workouts),
+                    ),
+
+                    // 4. Menu Konversi Hijriah & Umur Detail
+                    _buildMenuCard(
+                      title: 'Konversi Hijriah & Umur',
+                      subtitle: 'Konversi kalender Hijriah & hitung umur detail',
+                      icon: Icons.nights_stay_rounded,
+                      color: const Color(0xFF0F766E),
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.age),
+                    ),
+
+                    // 5. Menu Konversi Kalender Weton ke Saka Bali
+                    _buildMenuCard(
+                      title: 'Weton → Kalender Saka Bali',
+                      subtitle: 'Konversi tanggal ke Pasaran Jawa, Neptu, & Pawukon Bali',
+                      icon: Icons.calendar_month_rounded,
+                      color: const Color(0xFFEAB308),
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.calendar),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-
-              // Judul Bagian Menu
-              const Text(
-                'Menu Utama',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // 1. Menu Daftar Anggota
-              _buildMenuCard(
-                title: 'Daftar Anggota',
-                subtitle: 'Melihat dan mengelola anggota kelompok/pengguna',
-                icon: Icons.groups_rounded,
-                color: const Color(0xFF0284C7),
-                onTap: () => Navigator.pushNamed(context, AppRoutes.members),
-              ),
-
-              // 2. Menu Komputasi Tema: Kalkulator BMI
-              _buildMenuCard(
-                title: 'Kalkulator BMI',
-                subtitle: 'Hitung Indeks Massa Tubuh & ketahui status berat ideal',
-                icon: Icons.monitor_weight_rounded,
-                color: const Color(0xFF10B981),
-                onTap: () => Navigator.pushNamed(context, AppRoutes.bmi),
-              ),
-
-              // 3. Menu CRUD Tema: Manajemen Latihan
-              _buildMenuCard(
-                title: 'Catatan Latihan Fisik',
-                subtitle: 'Tambah, lihat, edit, dan hapus riwayat workout',
-                icon: Icons.fitness_center_rounded,
-                color: const Color(0xFFF97316),
-                onTap: () => Navigator.pushNamed(context, AppRoutes.workouts),
-              ),
-
-              // 4. Menu Konversi Tema: Konversi Berat
-              _buildMenuCard(
-                title: 'Konversi Satuan Berat',
-                subtitle: 'Konversi antara kg, gram, pound (lbs), dan ounce (oz)',
-                icon: Icons.swap_horiz_rounded,
-                color: const Color(0xFF8B5CF6),
-                onTap: () => Navigator.pushNamed(context, AppRoutes.converter),
-              ),
-
-              // 5. Menu Konversi Tanggal Hijriah & Perhitungan Umur
-              _buildMenuCard(
-                title: 'Konversi Hijriah & Umur',
-                subtitle: 'Konversi tanggal ke kalender Hijriah & hitung umur detail',
-                icon: Icons.nights_stay_rounded,
-                color: const Color(0xFF0F766E),
-                onTap: () => Navigator.pushNamed(context, AppRoutes.age),
-              ),
-
-              // 6. Menu Konversi Kalender Weton ke Saka Bali
-              _buildMenuCard(
-                title: 'Weton → Kalender Saka Bali',
-                subtitle: 'Konversi tanggal ke Pasaran Jawa, Neptu, dan Pawukon Bali',
-                icon: Icons.calendar_month_rounded,
-                color: const Color(0xFFEAB308),
-                onTap: () => Navigator.pushNamed(context, AppRoutes.calendar),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
