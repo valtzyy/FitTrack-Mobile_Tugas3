@@ -294,7 +294,9 @@ class AppCalculations {
     );
   }
 
-  // 5. Konversi Tanggal Masehi ke Kalender Hijriah (Metode Umm al-Qura)
+  // 5. Konversi Tanggal Masehi ke Kalender Hijriah
+  // Menggunakan standar astronomis Umm al-Qura untuk tahun 1937 - 2077 M,
+  // dan Kalender Tabular Aritmetis (Kuwaiti Algorithm) untuk tanggal sejarah (misal tahun 1500-an).
   static HijriResult convertToHijri(DateTime gregorianDate) {
     final dateOnly = DateTime(
       gregorianDate.year,
@@ -302,24 +304,99 @@ class AppCalculations {
       gregorianDate.day,
     );
 
-    final hijri = HijriCalendar.fromDate(dateOnly);
     final dayIndex = dateOnly.weekday % 7;
     final dayName = AppConstants.javaneseDays[dayIndex];
 
-    // Normalisasi indeks bulan Hijriah (1 - 12)
-    final monthIndex = (hijri.hMonth >= 1 && hijri.hMonth <= 12) ? hijri.hMonth - 1 : 0;
+    try {
+      // Coba konversi dengan tabel astronomis Umm al-Qura (rentang 1937 - 2077 M)
+      final hijri = HijriCalendar.fromDate(dateOnly);
+      final monthIndex = (hijri.hMonth >= 1 && hijri.hMonth <= 12) ? hijri.hMonth - 1 : 0;
+      final monthNameIndo = AppConstants.hijriMonthsIndo[monthIndex];
+      final fullDateHijri = '${hijri.hDay} $monthNameIndo ${hijri.hYear} H';
+
+      const islamicNotes =
+          'Dihitung berdasarkan hisab astronomis resmi kalender Umm al-Qura (lunar cycle).';
+
+      return HijriResult(
+        gregorianDate: dateOnly,
+        hYear: hijri.hYear,
+        hMonth: hijri.hMonth,
+        hDay: hijri.hDay,
+        dayName: dayName,
+        monthNameIndo: monthNameIndo,
+        fullDateHijri: fullDateHijri,
+        islamicNotes: islamicNotes,
+      );
+    } catch (_) {
+      // Fallback: Kalender Tabular Aritmetika Lunar untuk tanggal sejarah (seperti era 1500-an)
+      return _calculateTabularHijri(dateOnly, dayName);
+    }
+  }
+
+  // Algoritma Kalender Hijriah Tabular (Kuwaiti Algorithm / 30-year lunar cycle)
+  static HijriResult _calculateTabularHijri(DateTime date, String dayName) {
+    int y = date.year;
+    int m = date.month;
+    int d = date.day;
+
+    if (m < 3) {
+      y -= 1;
+      m += 12;
+    }
+
+    final int a = (y / 100).floor();
+    final int b = 2 - a + (a / 4).floor();
+    final double jd = (365.25 * (y + 4716)).floor() +
+        (30.6001 * (m + 1)).floor() +
+        d +
+        b -
+        1524.5;
+
+    final double z = jd - 1948439.5 + 0.5;
+    final int cyc = (z / 10631.0).floor();
+    final double rem = z - (cyc * 10631.0);
+    int j = ((rem - 0.5) / 354.36667).floor();
+    if (j > 29) j = 29;
+    if (j < 0) j = 0;
+    final int hYear = (30 * cyc + j) + 1;
+
+    const leapDaysBefore = [
+      0, 0, 1, 1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 10, 10, 10, 11
+    ];
+    final double daysIntoYear = rem - (j * 354.0 + leapDaysBefore[j]);
+
+    int hMonth = 1;
+    int hDay = daysIntoYear.floor();
+    if (hDay <= 0) hDay = 1;
+
+    final isLeapYear = [2, 5, 7, 10, 13, 16, 18, 21, 24, 26, 29].contains((hYear - 1) % 30 + 1);
+    final List<int> monthDays = [
+      30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, isLeapYear ? 30 : 29
+    ];
+    for (int i = 0; i < 12; i++) {
+      if (hDay > monthDays[i]) {
+        hDay -= monthDays[i];
+        hMonth++;
+      } else {
+        break;
+      }
+    }
+
+    if (hMonth > 12) hMonth = 12;
+
+    final monthIndex = (hMonth >= 1 && hMonth <= 12) ? hMonth - 1 : 0;
     final monthNameIndo = AppConstants.hijriMonthsIndo[monthIndex];
-    final fullDateHijri = '${hijri.hDay} $monthNameIndo ${hijri.hYear} H';
+    final fullDateHijri = '$hDay $monthNameIndo $hYear H';
 
     const islamicNotes =
-        'Kalender Hijriah (Qamariyah) didasarkan pada peredaran bulan mengelilingi bumi (lunar cycle). '
-        'Perhitungan ini mengacu pada standar kalender Umm al-Qura.';
+        'Dihitung menggunakan pendekatan Kalender Tabular Aritmetis (Aritmetika Lunar 30-tahun) '
+        'karena tanggal berada di luar rentang tabel data astronomis modern Umm al-Qura.';
 
     return HijriResult(
-      gregorianDate: dateOnly,
-      hYear: hijri.hYear,
-      hMonth: hijri.hMonth,
-      hDay: hijri.hDay,
+      gregorianDate: date,
+      hYear: hYear,
+      hMonth: hMonth,
+      hDay: hDay,
       dayName: dayName,
       monthNameIndo: monthNameIndo,
       fullDateHijri: fullDateHijri,

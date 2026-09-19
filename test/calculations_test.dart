@@ -200,5 +200,16 @@ void main() {
       expect(result.fullDateHijri, endsWith('H'));
       expect(result.islamicNotes, isNotEmpty);
     });
+
+    test('Verifikasi konversi tanggal sejarah tahun 1500-an (1 Jan 1500 -> 905 H) dengan algoritma Tabular', () {
+      final date = DateTime(1500, 1, 1);
+      final result = AppCalculations.convertToHijri(date);
+
+      expect(result.hYear, equals(905));
+      expect(result.hMonth, equals(5)); // Jumadil Awwal
+      expect(result.monthNameIndo, equals('Jumadil Awwal'));
+      expect(result.fullDateHijri, contains('905 H'));
+      expect(result.islamicNotes, contains('Tabular'));
+    });
   });
 }

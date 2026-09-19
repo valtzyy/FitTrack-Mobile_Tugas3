@@ -236,8 +236,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Konversi Hijriah & Umur'), findsOneWidget);
-      expect(find.text('HITUNG UMUR & KONVERSI HIJRIAH'), findsOneWidget);
+      expect(find.text('Hijriah & Umur'), findsOneWidget);
+      expect(find.text('Konversi Hijriah'), findsOneWidget);
+      expect(find.text('Kalkulator Umur'), findsOneWidget);
     });
 
     testWidgets('Layar Kalkulator BMI (BmiScreen) memuat tombol pintasan konversi berat', (tester) async {
