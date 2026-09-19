@@ -208,31 +208,6 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
     );
   }
 
-  // Chip tombol pintasan tanggal uji coba cepat
-  Widget _buildQuickDateChip(String label, DateTime date) {
-    final isSelected = _selectedDate.year == date.year &&
-        _selectedDate.month == date.month &&
-        _selectedDate.day == date.day;
-
-    return ActionChip(
-      avatar: Icon(
-        Icons.history_rounded,
-        size: 16,
-        color: isSelected ? Colors.white : const Color(0xFF0F766E),
-      ),
-      label: Text(label),
-      labelStyle: TextStyle(
-        fontSize: 11.5,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        color: isSelected ? Colors.white : const Color(0xFF0F766E),
-      ),
-      backgroundColor: isSelected ? const Color(0xFF0F766E) : const Color(0xFF0F766E).withAlpha(20),
-      side: BorderSide(
-        color: isSelected ? const Color(0xFF0F766E) : const Color(0xFF0F766E).withAlpha(50),
-      ),
-      onPressed: () => _applyDate(date),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -264,7 +239,7 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Mendukung tanggal sejarah era 1500-an (tokoh/pahlawan) hingga tanggal saat ini.',
+                        'Pilih tanggal untuk konversi kalender Hijriah atau perhitungan umur.',
                         style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                       ),
                       const SizedBox(height: 16),
@@ -279,25 +254,7 @@ class _AgeCalculatorScreenState extends State<AgeCalculatorScreen> {
                         suffixIcon: const Icon(Icons.event_available_rounded),
                         onTap: _pickDate,
                       ),
-                      const SizedBox(height: 14),
-
-                      // Pintasan Uji Coba Cepat
-                      const Text(
-                        'Pintasan Uji Coba Cepat:',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey),
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 6,
-                        children: [
-                          _buildQuickDateChip('1 Jan 1500 (Era Pahlawan)', DateTime(1500, 1, 1)),
-                          _buildQuickDateChip('22 Jun 1527 (Fatahillah)', DateTime(1527, 6, 22)),
-                          _buildQuickDateChip('17 Ags 1945 (Proklamasi)', DateTime(1945, 8, 17)),
-                          _buildQuickDateChip('Hari Ini', DateTime.now()),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 18),
 
                       // DUA TOMBOL AKSI TERPISAH
                       // Tombol 1: Konversi ke Hijriah
