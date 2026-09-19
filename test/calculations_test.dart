@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tugas3/constants/app_constants.dart';
 import 'package:tugas3/utils/calculations.dart';
+import 'package:tugas3/utils/formatters.dart';
 import 'package:tugas3/utils/validators.dart';
 
 void main() {
@@ -210,6 +211,35 @@ void main() {
       expect(result.monthNameIndo, equals('Jumadil Awwal'));
       expect(result.fullDateHijri, contains('905 H'));
       expect(result.islamicNotes, contains('Tabular'));
+    });
+  });
+
+  group('7. Pengujian Pemformat Stopwatch (AppFormatters.formatStopwatch)', () {
+    test('Format stopwatch di bawah 60 menit menggunakan format MM:SS.ms', () {
+      // 0 detik
+      expect(AppFormatters.formatStopwatch(0), equals('00:00.00'));
+
+      // 12 menit 34 detik 560 ms
+      const ms = (12 * 60 + 34) * 1000 + 560;
+      expect(AppFormatters.formatStopwatch(ms), equals('12:34.56'));
+
+      // 59 menit 59 detik 900 ms
+      const msNear60 = (59 * 60 + 59) * 1000 + 900;
+      expect(AppFormatters.formatStopwatch(msNear60), equals('59:59.90'));
+    });
+
+    test('Format stopwatch saat mencapai 60 menit TIDAK reset, melainkan LANJUT ke HH:MM:SS.ms', () {
+      // Tepat 60 menit (3.600.000 ms)
+      const ms60Min = 60 * 60 * 1000;
+      expect(AppFormatters.formatStopwatch(ms60Min), equals('01:00:00.00'));
+
+      // 1 jam 15 menit 30 detik 500 ms
+      const msPast60 = (1 * 3600 + 15 * 60 + 30) * 1000 + 500;
+      expect(AppFormatters.formatStopwatch(msPast60), equals('01:15:30.50'));
+
+      // 24 jam (86.400.000 ms)
+      const ms24Hours = 24 * 3600 * 1000;
+      expect(AppFormatters.formatStopwatch(ms24Hours), equals('24:00:00.00'));
     });
   });
 }

@@ -123,16 +123,22 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
                               : Colors.grey.shade500,
                         ),
                         const SizedBox(height: 12),
-                        // Teks Angka Waktu
-                        Text(
-                          timeFormatted,
-                          style: TextStyle(
-                            fontSize: 34,
-                            fontWeight: FontWeight.bold,
-                            fontFeatures: const [FontFeature.tabularFigures()],
-                            color: _status == StopwatchStatus.running
-                                ? theme.colorScheme.primary
-                                : const Color(0xFF1E293B),
+                        // Teks Angka Waktu (Skala otomatis menyesuaikan saat mencapai jam HH:MM:SS)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              timeFormatted,
+                              style: TextStyle(
+                                fontSize: 34,
+                                fontWeight: FontWeight.bold,
+                                fontFeatures: const [FontFeature.tabularFigures()],
+                                color: _status == StopwatchStatus.running
+                                    ? theme.colorScheme.primary
+                                    : const Color(0xFF1E293B),
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 6),
