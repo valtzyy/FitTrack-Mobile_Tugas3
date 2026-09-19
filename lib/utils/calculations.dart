@@ -192,7 +192,11 @@ class AppCalculations {
       months--;
       // Hari terakhir dari bulan sebelumnya
       final prevMonthLastDay = DateTime(target.year, target.month, 0).day;
-      days += prevMonthLastDay;
+      if (birth.day > prevMonthLastDay) {
+        days = target.day;
+      } else {
+        days += prevMonthLastDay;
+      }
     }
 
     // Jika bulan bernilai negatif, pinjam bulan dari tahun sebelumnya

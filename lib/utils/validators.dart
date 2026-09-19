@@ -70,13 +70,13 @@ class AppValidators {
     return null;
   }
 
-  // Validasi format email sederhana
+  // Validasi format email
   static String? validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Email tidak boleh kosong.';
     }
 
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     if (!emailRegex.hasMatch(value.trim())) {
       return 'Format email tidak valid (contoh: user@mail.com).';
     }
