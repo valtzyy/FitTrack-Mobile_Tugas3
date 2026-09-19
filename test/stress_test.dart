@@ -230,15 +230,25 @@ void main() {
       expect(find.text('KELUAR DARI APLIKASI (LOGOUT)'), findsOneWidget);
     });
 
-    testWidgets('Layar Konversi Hijriah & Umur (AgeCalculatorScreen) dapat dimuat dan dioperasikan', (tester) async {
+    testWidgets('Layar Konversi Hijriah & Umur (AgeCalculatorScreen) dapat dimuat dan tombol berfungsi', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(home: AgeCalculatorScreen()),
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Hijriah & Umur'), findsOneWidget);
-      expect(find.text('Konversi Hijriah'), findsOneWidget);
-      expect(find.text('Kalkulator Umur'), findsOneWidget);
+      expect(find.text('Konversi Hijriah & Umur'), findsOneWidget);
+      expect(find.text('KONVERSI KE HIJRIAH'), findsOneWidget);
+      expect(find.text('HITUNG UMUR'), findsOneWidget);
+
+      // Tekan tombol KONVERSI KE HIJRIAH
+      await tester.tap(find.text('KONVERSI KE HIJRIAH'));
+      await tester.pumpAndSettle();
+      expect(find.text('Hasil Konversi Kalender Hijriah'), findsOneWidget);
+
+      // Tekan tombol HITUNG UMUR
+      await tester.tap(find.text('HITUNG UMUR'));
+      await tester.pumpAndSettle();
+      expect(find.text('Rincian Umur Sadar Kalender'), findsOneWidget);
     });
 
     testWidgets('Layar Kalkulator BMI (BmiScreen) memuat tombol pintasan konversi berat', (tester) async {
