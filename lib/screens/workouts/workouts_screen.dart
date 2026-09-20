@@ -3,7 +3,6 @@ import '../../models/workout_model.dart';
 import '../../services/database_service.dart';
 import '../../utils/formatters.dart';
 import '../../utils/validators.dart';
-import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/error_state_widget.dart';
@@ -54,213 +53,24 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
   // Menampilkan modal dialog untuk Tambah (Create) atau Ubah (Update) Latihan
   Future<void> _showWorkoutFormDialog({WorkoutModel? existingWorkout}) async {
     final isEdit = existingWorkout != null;
-    final formKey = GlobalKey<FormState>();
-
-    final nameController = TextEditingController(text: existingWorkout?.exerciseName ?? '');
-    final durationController = TextEditingController(
-      text: existingWorkout != null ? existingWorkout.durationMinutes.toString() : '',
-    );
-    final caloriesController = TextEditingController(
-      text: existingWorkout != null ? existingWorkout.calories.toString() : '',
-    );
-    final notesController = TextEditingController(text: existingWorkout?.notes ?? '');
-
-    // Default tanggal hari ini atau tanggal latihan yang sedang diedit
-    DateTime selectedDate = existingWorkout != null
-        ? (AppFormatters.parseDate(existingWorkout.workoutDate) ?? DateTime.now())
-        : DateTime.now();
-
-    final dateController = TextEditingController(
-      text: AppFormatters.formatDate(selectedDate),
-    );
-
-    bool isSubmitting = false;
-
-    await showDialog(
+    final success = await showDialog<bool>(
       context: context,
-      builder: (dialogCtx) => StatefulBuilder(
-        builder: (modalCtx, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Row(
-            children: [
-              Icon(
-                isEdit ? Icons.edit_note_rounded : Icons.add_circle_outline_rounded,
-                color: const Color(0xFF0F766E),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                isEdit ? 'Ubah Catatan Latihan' : 'Tambah Latihan Baru',
-                style: const TextStyle(fontSize: 18),
-              ),
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Nama Latihan
-                  AppTextField(
-                    controller: nameController,
-                    label: 'Nama Latihan',
-                    hint: 'Contoh: Jogging, Push Up',
-                    prefixIcon: Icons.fitness_center_rounded,
-                    validator: (val) => AppValidators.validateRequired(val, 'Nama latihan'),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Durasi (menit)
-                  AppTextField(
-                    controller: durationController,
-                    label: 'Durasi (Menit)',
-                    hint: 'Contoh: 30',
-                    prefixIcon: Icons.timer_outlined,
-                    keyboardType: TextInputType.number,
-                    validator: (val) => AppValidators.validatePositiveInteger(val, 'Durasi'),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Kalori terbakar
-                  AppTextField(
-                    controller: caloriesController,
-                    label: 'Kalori Terbakar (kkal)',
-                    hint: 'Contoh: 200',
-                    prefixIcon: Icons.local_fire_department_outlined,
-                    keyboardType: TextInputType.number,
-                    validator: (val) => AppValidators.validatePositiveInteger(
-                      val,
-                      'Kalori',
-                      allowZero: true,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Tanggal Latihan (DatePicker)
-                  AppTextField(
-                    controller: dateController,
-                    label: 'Tanggal Latihan',
-                    readOnly: true,
-                    prefixIcon: Icons.calendar_today_outlined,
-                    onTap: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: selectedDate,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2100),
-                      );
-                      if (picked != null) {
-                        selectedDate = picked;
-                        setDialogState(() {
-                          dateController.text = AppFormatters.formatDate(picked);
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Catatan tambahan (opsional)
-                  AppTextField(
-                    controller: notesController,
-                    label: 'Catatan (Opsional)',
-                    hint: 'Contoh: Pagi hari sebelum kuliah',
-                    prefixIcon: Icons.notes_rounded,
-                    maxLines: 2,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogCtx),
-              child: const Text('Batal'),
-            ),
-            SizedBox(
-              width: 140,
-              child: AppButton(
-                text: isEdit ? 'Simpan' : 'Tambah',
-                height: 40,
-                isLoading: isSubmitting,
-                onPressed: () async {
-                  if (!formKey.currentState!.validate()) return;
-
-                  setDialogState(() => isSubmitting = true);
-
-                  try {
-                    final now = DateTime.now().toIso8601String();
-
-                    if (isEdit) {
-                      // UPDATE latihan
-                      final updated = existingWorkout.copyWith(
-                        exerciseName: nameController.text.trim(),
-                        durationMinutes: int.parse(durationController.text.trim()),
-                        calories: int.parse(caloriesController.text.trim()),
-                        workoutDate: dateController.text.trim(),
-                        notes: notesController.text.trim().isNotEmpty
-                            ? notesController.text.trim()
-                            : null,
-                        updatedAt: now,
-                      );
-                      await _dbService.updateWorkout(updated);
-                    } else {
-                      // CREATE latihan
-                      final created = WorkoutModel(
-                        exerciseName: nameController.text.trim(),
-                        durationMinutes: int.parse(durationController.text.trim()),
-                        calories: int.parse(caloriesController.text.trim()),
-                        workoutDate: dateController.text.trim(),
-                        notes: notesController.text.trim().isNotEmpty
-                            ? notesController.text.trim()
-                            : null,
-                        createdAt: now,
-                        updatedAt: now,
-                      );
-                      await _dbService.insertWorkout(created);
-                    }
-
-                    if (!modalCtx.mounted) return;
-                    Navigator.pop(dialogCtx);
-
-                    if (!mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          isEdit
-                              ? 'Data latihan berhasil diperbarui.'
-                              : 'Data latihan berhasil disimpan.',
-                        ),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-
-                    _fetchWorkouts();
-                  } catch (e) {
-                    if (modalCtx.mounted) {
-                      setDialogState(() => isSubmitting = false);
-                    }
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Gagal menyimpan latihan: $e'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+      builder: (ctx) => _WorkoutFormDialog(existingWorkout: existingWorkout),
     );
 
-    nameController.dispose();
-    durationController.dispose();
-    caloriesController.dispose();
-    dateController.dispose();
-    notesController.dispose();
+    if (success == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isEdit
+                ? 'Data latihan berhasil diperbarui.'
+                : 'Data latihan berhasil disimpan.',
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+      _fetchWorkouts();
+    }
   }
 
   // Menghapus data latihan dengan dialog konfirmasi wajib
@@ -497,6 +307,219 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+// Dialog formulir modal untuk Tambah atau Ubah catatan latihan secara terisolasi dan aman
+class _WorkoutFormDialog extends StatefulWidget {
+  final WorkoutModel? existingWorkout;
+  const _WorkoutFormDialog({this.existingWorkout});
+
+  @override
+  State<_WorkoutFormDialog> createState() => _WorkoutFormDialogState();
+}
+
+class _WorkoutFormDialogState extends State<_WorkoutFormDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _nameController;
+  late final TextEditingController _durationController;
+  late final TextEditingController _caloriesController;
+  late final TextEditingController _dateController;
+  late final TextEditingController _notesController;
+  late DateTime _selectedDate;
+  bool _isSubmitting = false;
+
+  bool get _isEdit => widget.existingWorkout != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final existing = widget.existingWorkout;
+    _nameController = TextEditingController(text: existing?.exerciseName ?? '');
+    _durationController = TextEditingController(
+      text: existing != null ? existing.durationMinutes.toString() : '',
+    );
+    _caloriesController = TextEditingController(
+      text: existing != null ? existing.calories.toString() : '',
+    );
+    _notesController = TextEditingController(text: existing?.notes ?? '');
+
+    _selectedDate = existing != null
+        ? (AppFormatters.parseDate(existing.workoutDate) ?? DateTime.now())
+        : DateTime.now();
+
+    _dateController = TextEditingController(
+      text: AppFormatters.formatDate(_selectedDate),
+    );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _durationController.dispose();
+    _caloriesController.dispose();
+    _dateController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      final now = DateTime.now().toIso8601String();
+
+      if (_isEdit) {
+        final updated = widget.existingWorkout!.copyWith(
+          exerciseName: _nameController.text.trim(),
+          durationMinutes: int.parse(_durationController.text.trim()),
+          calories: int.parse(_caloriesController.text.trim()),
+          workoutDate: _dateController.text.trim(),
+          notes: _notesController.text.trim().isNotEmpty
+              ? _notesController.text.trim()
+              : null,
+          updatedAt: now,
+        );
+        await DatabaseService.instance.updateWorkout(updated);
+      } else {
+        final created = WorkoutModel(
+          exerciseName: _nameController.text.trim(),
+          durationMinutes: int.parse(_durationController.text.trim()),
+          calories: int.parse(_caloriesController.text.trim()),
+          workoutDate: _dateController.text.trim(),
+          notes: _notesController.text.trim().isNotEmpty
+              ? _notesController.text.trim()
+              : null,
+          createdAt: now,
+          updatedAt: now,
+        );
+        await DatabaseService.instance.insertWorkout(created);
+      }
+
+      if (!mounted) return;
+      Navigator.pop(context, true);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal menyimpan latihan: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Row(
+        children: [
+          Icon(
+            _isEdit ? Icons.edit_note_rounded : Icons.add_circle_outline_rounded,
+            color: const Color(0xFF0F766E),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            _isEdit ? 'Ubah Catatan Latihan' : 'Tambah Latihan Baru',
+            style: const TextStyle(fontSize: 18),
+          ),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AppTextField(
+                controller: _nameController,
+                label: 'Nama Latihan',
+                hint: 'Contoh: Jogging, Push Up',
+                prefixIcon: Icons.fitness_center_rounded,
+                validator: (val) => AppValidators.validateRequired(val, 'Nama latihan'),
+              ),
+              const SizedBox(height: 12),
+              AppTextField(
+                controller: _durationController,
+                label: 'Durasi (Menit)',
+                hint: 'Contoh: 30',
+                prefixIcon: Icons.timer_outlined,
+                keyboardType: TextInputType.number,
+                validator: (val) => AppValidators.validatePositiveInteger(val, 'Durasi'),
+              ),
+              const SizedBox(height: 12),
+              AppTextField(
+                controller: _caloriesController,
+                label: 'Kalori Terbakar (kkal)',
+                hint: 'Contoh: 200',
+                prefixIcon: Icons.local_fire_department_outlined,
+                keyboardType: TextInputType.number,
+                validator: (val) => AppValidators.validatePositiveInteger(
+                  val,
+                  'Kalori',
+                  allowZero: true,
+                ),
+              ),
+              const SizedBox(height: 12),
+              AppTextField(
+                controller: _dateController,
+                label: 'Tanggal Latihan',
+                readOnly: true,
+                prefixIcon: Icons.calendar_today_outlined,
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _selectedDate,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+                  if (picked != null) {
+                    _selectedDate = picked;
+                    setState(() {
+                      _dateController.text = AppFormatters.formatDate(picked);
+                    });
+                  }
+                },
+              ),
+              const SizedBox(height: 12),
+              AppTextField(
+                controller: _notesController,
+                label: 'Catatan (Opsional)',
+                hint: 'Contoh: Pagi hari sebelum kuliah',
+                prefixIcon: Icons.notes_rounded,
+                maxLines: 2,
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Batal'),
+        ),
+        ElevatedButton(
+          onPressed: _isSubmitting ? null : _submit,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF0F766E),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
+          child: _isSubmitting
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                )
+              : Text(_isEdit ? 'Simpan' : 'Tambah'),
+        ),
+      ],
     );
   }
 }
