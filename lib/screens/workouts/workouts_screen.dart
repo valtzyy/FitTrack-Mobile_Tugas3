@@ -320,10 +320,10 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       appBar: AppBar(
         title: const Text('Catatan Latihan Fisik'),
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _showWorkoutFormDialog(),
-        icon: const Icon(Icons.add),
-        label: const Text('+ Tambah Latihan'),
+        tooltip: 'Tambah Latihan',
+        child: const Icon(Icons.add),
       ),
       body: _buildBody(),
     );

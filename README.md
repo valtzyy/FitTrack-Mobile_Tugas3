@@ -47,17 +47,16 @@ FitTrack membantu pengguna sehari-hari (termasuk mahasiswa) untuk memantau keseh
 - Dialog konfirmasi saat Logout dan pembersihan tumpukan rute navigasi.
 
 ### 2. Navigasi Bawah (Bottom Navigation Bar)
-- **Beranda**: Menampilkan sapaan nama pengguna dan 6 kartu menu fungsional vertikal.
-- **Stopwatch**: Penghitung waktu dengan status visual (Start, Pause, Resume, Reset) yang aman dari kebocoran memori.
-- **Bantuan / Tutorial**: Berisi 10 petunjuk lengkap penggunaan aplikasi serta tombol Logout.
+- **Beranda**: Menampilkan sapaan nama pengguna dan 5 kartu menu vertikal terpusat di tengah layar.
+- **Stopwatch**: Pengukur durasi latihan dengan transisi format waktu otomatis (MM:SS.ms ke HH:MM:SS.ms).
+- **Bantuan**: Berisi 10 petunjuk lengkap penggunaan aplikasi serta tombol Logout.
 
-### 3. Enam Menu Utama Beranda
-1. **Daftar Anggota**: Menampilkan daftar anggota/mahasiswa dengan nama, email, gender, dan usia (terhubung ke SQLite).
-2. **Kalkulator BMI**: Perhitungan Indeks Massa Tubuh dengan batas kategori edukasi dan banner disclaimer medis.
-3. **Catatan Latihan Fisik (CRUD)**: Tambah, lihat, ubah, dan hapus latihan fisik (durasi, kalori, tanggal, catatan) dengan dialog konfirmasi & SnackBar.
-4. **Konversi Satuan Berat**: Konversi dua arah antara Kilogram (kg), Gram (g), Pound (lbs), dan Ounce (oz).
-5. **Kalkulator Umur**: Pemilihan tanggal lahir via kalender (*DatePicker*) dengan kalkulasi presisi Tahun, Bulan, Hari, serta total estimasi hari/jam/menit/detik.
-6. **Weton → Kalender Saka Bali**: Konversi tanggal Masehi ke Hari Jawa, Pasaran (Legi, Pahing, Pon, Wage, Kliwon), Bobot Neptu, serta Kalender Saka Bali (Sapta Wara, Panca Wara, Wuku Pawukon 210 hari, dan Tahun Saka).
+### 3. Lima Menu Utama Beranda (Vertikal Tengah)
+1. **Daftar Anggota**: Menampilkan daftar 4 anggota kelompok pengembang UPNYK (terhubung ke SQLite).
+2. **Kalkulator BMI & Pintasan Konversi Berat**: Komputasi BMI dengan kategori edukasi, disclaimer medis, dan integrasi layar konversi berat dua arah (kg, g, lbs, oz).
+3. **Catatan Latihan Fisik (CRUD)**: Kelola riwayat latihan fisik (tambah, lihat, ubah, hapus) tersimpan di SQLite.
+4. **Konversi Kalender Hijriah & Kalkulator Umur**: Konversi penanggalan Hijriah dual-engine (Umm al-Qura + Tabular era 1500-an) serta kalkulator umur sadar kalender.
+5. **Weton & Kalender Saka Bali**: Konversi tanggal Masehi ke Hari Jawa, Pasaran (Legi, Pahing, Pon, Wage, Kliwon), Bobot Neptu, serta Kalender Saka Bali (Sapta Wara, Panca Wara, Wuku Pawukon 210 hari, dan Tahun Saka).
 
 ---
 
@@ -112,15 +111,15 @@ lib/
 │   ├── splash/splash_screen.dart      # Layar pembuka & pengecekan sesi login
 │   ├── auth/login_screen.dart         # Layar login & tombol isi akun demo
 │   ├── main_navigation_screen.dart    # Wadah BottomNavigationBar (Home, Stopwatch, Help)
-│   ├── home/home_screen.dart          # Beranda: salam personal & 6 kartu menu vertikal
-│   ├── members/members_screen.dart    # Menu 1: Daftar Anggota kelompok / pengguna
-│   ├── bmi/bmi_screen.dart            # Menu 2: Kalkulator BMI & disclaimer
-│   ├── workouts/workouts_screen.dart  # Menu 3: CRUD Catatan Latihan Fisik
-│   ├── converter/weight_converter_screen.dart # Menu 4: Konversi Satuan Berat
-│   ├── age/age_calculator_screen.dart # Menu 5: Kalkulator Umur Sadar Kalender
-│   ├── calendar/weton_saka_screen.dart # Menu 6: Weton Jawa ke Saka Bali
-│   ├── stopwatch/stopwatch_screen.dart # Tab Navigasi 2: Stopwatch latihan
-│   └── help/help_screen.dart          # Tab Navigasi 3: Tutorial & tombol Logout
+│   ├── home/home_screen.dart          # Beranda: sapaan pengguna & 5 kartu menu vertikal
+│   ├── members/members_screen.dart    # Menu 1: Daftar Anggota kelompok (SQLite)
+│   ├── bmi/bmi_screen.dart            # Menu 2: Kalkulator BMI & pintasan konversi berat
+│   ├── workouts/workouts_screen.dart  # Menu 3: CRUD Catatan Latihan Fisik (SQLite)
+│   ├── age/age_calculator_screen.dart # Menu 4: Konversi Kalender Hijriah & Kalkulator Umur
+│   ├── calendar/weton_saka_screen.dart # Menu 5: Weton Jawa & Kalender Saka Bali
+│   ├── converter/weight_converter_screen.dart # Layar Pintasan: Konversi Satuan Berat
+│   ├── stopwatch/stopwatch_screen.dart # Tab Navigasi 2: Stopwatch latihan (HH:MM:SS)
+│   └── help/help_screen.dart          # Tab Navigasi 3: Tutorial (10 item) & tombol Logout
 ├── widgets/
 │   ├── app_button.dart                # Tombol serbaguna dengan loading indicator
 │   ├── app_text_field.dart            # Input teks seragam dengan validasi
@@ -191,7 +190,7 @@ File database tersimpan di perangkat lokal dengan nama `fittrack.db`.
 ---
 
 ## 📝 Alur CRUD Latihan Fisik
-- **Create**: Tekan tombol `+ Tambah Latihan` $\rightarrow$ Isi form dialog $\rightarrow$ `DatabaseService.insertWorkout()` $\rightarrow$ SnackBar sukses $\rightarrow$ Daftar dimuat ulang.
+- **Create**: Tekan tombol tambah (`+`) di pojok kanan bawah $\rightarrow$ Isi form dialog $\rightarrow$ `DatabaseService.insertWorkout()` $\rightarrow$ SnackBar sukses $\rightarrow$ Daftar dimuat ulang.
 - **Read**: `DatabaseService.getAllWorkouts()` menampilkan riwayat dalam bentuk kartu informatif (nama latihan, tanggal, durasi, kalori, catatan).
 - **Update**: Tekan ikon pensil $\rightarrow$ Form terisi data lama $\rightarrow$ Ubah data $\rightarrow$ `DatabaseService.updateWorkout()` $\rightarrow$ SnackBar sukses.
 - **Delete**: Tekan ikon tempat sampah $\rightarrow$ Muncul dialog "Hapus latihan ini?" $\rightarrow$ Konfirmasi $\rightarrow$ `DatabaseService.deleteWorkout()` $\rightarrow$ SnackBar sukses.
