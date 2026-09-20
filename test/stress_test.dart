@@ -197,7 +197,7 @@ void main() {
       expect(find.text('Kalkulator BMI'), findsOneWidget);
       expect(find.text('Catatan Latihan Fisik'), findsOneWidget);
       expect(find.text('Konversi Hijriah & Umur'), findsOneWidget);
-      expect(find.text('Weton → Kalender Saka Bali'), findsOneWidget);
+      expect(find.text('Weton & Kalender Saka Bali'), findsOneWidget);
 
       // Memastikan menu ke-6 lama tidak ada lagi
       expect(find.text('Konversi Satuan Berat'), findsNothing);

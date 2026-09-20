@@ -268,9 +268,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () => Navigator.pushNamed(context, AppRoutes.age),
                     ),
 
-                    // 5. Menu Konversi Kalender Weton ke Saka Bali
+                    // 5. Menu Konversi Kalender Weton & Saka Bali
                     _buildMenuCard(
-                      title: 'Weton → Kalender Saka Bali',
+                      title: 'Weton & Kalender Saka Bali',
                       subtitle: 'Konversi tanggal ke Pasaran Jawa, Neptu, & Pawukon Bali',
                       icon: Icons.calendar_month_rounded,
                       color: const Color(0xFFEAB308),

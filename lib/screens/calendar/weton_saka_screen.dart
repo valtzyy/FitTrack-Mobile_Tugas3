@@ -100,7 +100,7 @@ class _WetonSakaScreenState extends State<WetonSakaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Weton → Saka Bali'),
+        title: const Text('Weton & Saka Bali'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
